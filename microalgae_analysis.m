@@ -51,7 +51,7 @@ xlabel('Grazing Treatment')
 ylabel('F0, December 2013')
 
 figure()
-[c,m] = multcompare(stats, 'ctype', 'hsd') % calculates Tukey's test
+[p_vals, means] = multcompare(stats, 'ctype', 'hsd') % calculates Tukey's test
 % and displays the following:
     % c = tukey's comparison table, column names = ['group 1', 'group 2
     % that is being compared to group 1', 'lower 95% confidence threshold
@@ -78,26 +78,26 @@ ylabel('Daily max temp [C], December 2013')
 
 disp('Connections between %cover and F0') % ------------------------------
 
-disp('Morphotype 5')
-
-[p, t, stats] = anova1(treatment_bio_data(:,6), treatment);
-title('Effect of grazing on Presence of Morphotype 5 (Noodles)')
-xlabel('Grazing Treatment')
-ylabel('%cover Morphotype 5')
-
-disp('Morphotype 10')
-
-[p, t, stats] = anova1(treatment_bio_data(:,11), treatment);
-title('Effect of grazing on Presence of Morphotype 10 (Rod-shaped diatoms)')
-xlabel('Grazing Treatment')
-ylabel('%cover Morphotype 10')
-
-disp('Morphotype 13')
-
-[p, t, stats] = anova1(treatment_bio_data(:,14), treatment);
-title('Effect of grazing on Presence of Morphotype 13 (Encrusting)')
-xlabel('Grazing Treatment')
-ylabel('%cover Morphotype 13')
+% disp('Morphotype 5')
+% 
+% [p, t, stats] = anova1(treatment_bio_data(:,6), treatment);
+% title('Effect of grazing on Presence of Morphotype 5 (Noodles)')
+% xlabel('Grazing Treatment')
+% ylabel('%cover Morphotype 5')
+% 
+% disp('Morphotype 10')
+% 
+% [p, t, stats] = anova1(treatment_bio_data(:,11), treatment);
+% title('Effect of grazing on Presence of Morphotype 10 (Rod-shaped diatoms)')
+% xlabel('Grazing Treatment')
+% ylabel('%cover Morphotype 10')
+% 
+% disp('Morphotype 13')
+% 
+% [p, t, stats] = anova1(treatment_bio_data(:,14), treatment);
+% title('Effect of grazing on Presence of Morphotype 13 (Encrusting)')
+% xlabel('Grazing Treatment')
+% ylabel('%cover Morphotype 13')
 
 disp('Morphotype 14')
 
@@ -107,14 +107,14 @@ xlabel('Grazing Treatment')
 ylabel('%cover Morphotype 14')
 
 figure()
-[c,m] = multcompare(stats, 'ctype', 'hsd') % calculates Tukey's test
+[p_vals, means] = multcompare(stats, 'ctype', 'hsd') % calculates Tukey's test
 
-disp('Filamentous Cyanobacteria')
-
-[p, t, stats] = anova1(group_bio_data(:,2), treatment);
-title('Effect of grazing on Presence of Filamentous Cyanobacteria')
-xlabel('Grazing Treatment')
-ylabel('%cover Filamentous Cyanobacteria')
+% disp('Filamentous Cyanobacteria')
+% 
+% [p, t, stats] = anova1(group_bio_data(:,2), treatment);
+% title('Effect of grazing on Presence of Filamentous Cyanobacteria')
+% xlabel('Grazing Treatment')
+% ylabel('%cover Filamentous Cyanobacteria')
 
 disp('Diatoms')
 
@@ -124,7 +124,7 @@ xlabel('Grazing Treatment')
 ylabel('%cover Diatoms')
 
 figure()
-[c,m] = multcompare(stats, 'ctype', 'hsd') % calculates Tukey's test
+[p_vals, means] = multcompare(stats, 'ctype', 'hsd') % calculates Tukey's test
 
 disp('Encrusting')
 
@@ -134,21 +134,21 @@ xlabel('Grazing Treatment')
 ylabel('%cover Encrusting Biofilm')
 
 figure()
-[c,m] = multcompare(stats, 'ctype', 'hsd') % calculates Tukey's test
+[p_vals, means] = multcompare(stats, 'ctype', 'hsd') % calculates Tukey's test
 
-disp('Coccoidal Cyanobacteria')
-
-[p, t, stats] = anova1(group_bio_data(:,5), treatment);
-title('Effect of grazing on Presence of Coccoidal Cyanobacteria')
-xlabel('Grazing Treatment')
-ylabel('%cover Coccoidal Cyanobacteria')
+% disp('Coccoidal Cyanobacteria')
+% 
+% [p, t, stats] = anova1(group_bio_data(:,5), treatment);
+% title('Effect of grazing on Presence of Coccoidal Cyanobacteria')
+% xlabel('Grazing Treatment')
+% ylabel('%cover Coccoidal Cyanobacteria')
 
 disp('Check for interactions between F0, temp and %cover') % ------------
 
 disp('Relationship between F0 and max temp')
 % there should be a negative correlation between F0 and max temp
 
-mdl = fitlm(enviro_data(:,4), enviro_data(:,2))
+mdl = fitlm(enviro_data(:,4), enviro_data(:,2));
 % fit a linear model
 
 figure()
@@ -158,55 +158,64 @@ title('Relationship between max temp and F0')
 xlabel('Maximum Temperature [C]')
 ylabel('Fluorescence F0')
 
-xdata = enviro_data(:,4); % temp data
-xA = [xdata(1), xdata(5), xdata(9), xdata(13)];
-xB = [xdata(2), xdata(6), xdata(10), xdata(14)];
-xC = [xdata(3), xdata(7), xdata(11), xdata(15)];
-xD = [xdata(4), xdata(8), xdata(12), xdata(16)];
+%% ANCOVA TESTS
 
+xdata = enviro_data(:,4); % temp data
 ydata = enviro_data(:,2); % F0 data
 
-yA = [ydata(1), ydata(5), ydata(9), ydata(13)];
-yB = [ydata(2), ydata(6), ydata(10), ydata(14)];
-yC = [ydata(3), ydata(7), ydata(11), ydata(15)];
-yD = [ydata(4), ydata(8), ydata(12), ydata(16)];
+disp('ANCOVA test looking at F0, temperature and treatment') % -----------
 
-p = polyfit(xA, yA, 1); % returns the slope and intercept of linear fit
-fit_yA = p(1)*xA + p(2); % calculates predicted y-values based on linear 
-% model
-p2 = polyfit(xB, yB, 1);
-fit_yB = p2(1)*xB + p2(2); 
-p3 = polyfit(xC, yC, 1);
-fit_yC = p3(1)*xC + p3(2); 
-p4 = polyfit(xD, yD, 1);
-fit_yD = p4(1)*xD + p4(2); 
+[h, atab, ctab, stats] = aoctool(xdata, ydata, treatment, 0.05);
+% Performs an ANCOVA test  - results seem to indicate an interaction
+% between temperature and treatment A
 
 figure()
-hold on
-scatter(xA, yA, 'g')
-plot(xA, fit_yA, 'g')
-scatter(xB, yB, 'c')
-plot(xB, fit_yB, 'c')
-scatter(xC, yC, 'm')
-plot(xC, fit_yC, 'm')
-scatter(xD, yD, 'b')
-plot(xD, fit_yD, 'b')
-title('Effects of temperature and grazing on F0')
-xlabel('Max Temp [C]')
-ylabel('F0')
-legend('Ungrazed', 'Linear Fit A', 'Community Grazed', 'Linear Fit B', ...
-    'L. scabra', 'Linear Fit C', 'L. austrodigitalis', 'Linear FIt D')
-hold off
+multcompare(stats, 'ctype', 'hsd') % calculates Tukey's test
 
-aoctool(xdata, ydata, treatment, 0.05)
-% Performs an ANCOVA test  - results seem to indicate no interaction
-% between temperature and treatment
+% disp('ANCOVA test looking at F0, filamentous cyanobacteria and treatment') 
+% 
+% [h, atab, ctab, stats] = aoctool(group_bio_data(:,2), ydata, treatment, ...
+%     0.05); % ANCOVA
+% 
+% disp('ANCOVA test looking at F0, diatoms and treatment') % ---------------
+% 
+% [h, atab, ctab, stats] = aoctool(group_bio_data(:,3), ydata, treatment, ...
+%     0.05); % ANCOVA
+% 
+% disp('ANCOVA test looking at F0, encrusting biofilm and treatment') % ----
+% 
+% [h, atab, ctab, stats] = aoctool(group_bio_data(:,4), ydata, treatment, ...
+%     0.05); % ANCOVA
+% 
+% disp('ANCOVA test looking at F0, cocoidal cyanobacteria and treatment') 
+% 
+% [h, atab, ctab, stats] = aoctool(group_bio_data(:,5), ydata, treatment, ...
+%     0.05); % ANCOVA
 
+disp('ANCOVA test looking at temp, filamentous cyanobacteria and treatment') 
 
+[h, atab, ctab, stats] = aoctool(xdata, group_bio_data(:,2), treatment, ...
+    0.05); % ANCOVA
+figure()
+multcompare(stats, 'ctype', 'hsd')
 
+% disp('ANCOVA test looking at temp, diatoms and treatment') % -------------
+% 
+% [h, atab, ctab, stats] = aoctool(xdata, group_bio_data(:,3), treatment, ...
+%     0.05); % ANCOVA
+% 
+% disp('ANCOVA test looking at temp, encrusting biofilm and treatment') % --
+% 
+% [h, atab, ctab, stats] = aoctool(xdata, group_bio_data(:,4), treatment, ...
+%     0.05); % ANCOVA
+% 
+% disp('ANCOVA test looking at temp, cocoidal cyanobacteria and treatment') 
+% 
+% [h, atab, ctab, stats] = aoctool(xdata, group_bio_data(:,5), treatment, ...
+%     0.05); % ANCOVA
 
+%% COMPARE WITH LIMPET GROWTH DATA
 
-
-
+%% COMPARE WITH RADULA SIZE
 
 
