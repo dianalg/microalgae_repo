@@ -125,6 +125,7 @@ disp('Effect of grazing on F0') % ----------------------------------------
 title('Effect of grazing on F0')
 xlabel('Grazing Treatment')
 ylabel('F0, December 2013')
+t
 
 figure()
 [p_vals, means] = multcompare(stats, 'ctype', 'hsd') % calculates Tukey's test
